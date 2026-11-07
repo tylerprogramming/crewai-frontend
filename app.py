@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Body, File, Form, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import socket
@@ -87,8 +88,9 @@ async def file_handler_endpoint(
             # Get the parsed content in markdown format
             markdown_content = docling_result.document.export_to_markdown()
             
-            # Process with CrewAI
-            crew_result = run(markdown_content)
+            # Process with CrewAI. crewai 1.x refuses a sync kickoff() inside
+            # a running event loop, so run the crew in a worker thread.
+            crew_result = await run_in_threadpool(run, markdown_content)
             
             # Return the results
             return {

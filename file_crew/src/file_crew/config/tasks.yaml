@@ -6,12 +6,12 @@ research_task:
     A structured report containing the following sections, derived from the analyzed markdown documents:
     
     1. Key Points (Concise Summary):
-       - A list of 5-7 bullet points summarizing the most critical and impactful findings related to {topic}.
+       - A list of 5-7 bullet points summarizing the most critical and impactful findings in the document.
        - Each bullet point should be factually accurate and referenced to its source markdown document.
        - Aim for clarity and conciseness, capturing the essence of the information in a single sentence.
     
     2. Quick Summary (Executive Overview):
-       - A brief paragraph (approximately 50-75 words) providing a high-level overview of the current state of {topic}.
+       - A brief paragraph (approximately 50-75 words) providing a high-level overview of the subject the document covers.
        - Highlight the most significant recent developments and their potential implications.
        - Avoid jargon and technical terms, making it accessible to a general audience.
     

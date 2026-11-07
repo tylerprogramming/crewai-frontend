@@ -7,9 +7,12 @@ from typing import List
 
 load_dotenv()
 
+# gemini-2.0-flash, used in the video, shut down on 2026-06-01:
+# https://ai.google.dev/gemini-api/docs/deprecations
+# Set GEMINI_MODEL in .env to try another Gemini model.
 google_flash_llm = LLM(
-	model="gemini/gemini-2.0-flash",
-	api_key=os.getenv("GOOGLE_API_KEY"),
+	model=f"gemini/{os.getenv('GEMINI_MODEL', 'gemini-3.8-flash')}",
+	api_key=os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY"),
 )
 
 class ResearchOutput(BaseModel):

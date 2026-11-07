@@ -17,12 +17,15 @@ This is a FastAPI application that uses Docling to parse PDF files and extract t
 - **Markdown Export**: Returns parsed content in markdown format
 - **Clean Implementation**: Proper error handling and temporary file management
 
+> **Updated for CrewAI 1.15 (2026-11).** The video used CrewAI 0.105 and `gemini-2.0-flash`. Google shut that model down on 2026-06-01 ([Gemini deprecations](https://ai.google.dev/gemini-api/docs/deprecations)), so the crew now defaults to `gemini-3.8-flash`. `requirements.txt` lists only the packages the app imports, not the original 417-line freeze. The code may differ slightly from the video.
+
 ## Requirements
 
-- Python 3.9+
+- Python 3.10 to 3.13 (CrewAI 1.15 needs >=3.10,<3.14)
 - FastAPI
 - Docling
-- CrewAI
+- CrewAI 1.15 with the `google-genai` extra
+- A Google AI Studio API key (`GOOGLE_API_KEY`)
 - Other dependencies as specified in requirements.txt
 
 ## Setup
@@ -30,8 +33,8 @@ This is a FastAPI application that uses Docling to parse PDF files and extract t
 1. Clone the repository:
 
 ```bash
-git clone <your-repository-url>
-cd <repository-directory>
+git clone https://github.com/tylerprogramming/crewai-frontend.git
+cd crewai-frontend
 ```
 
 2. Set up a virtual environment (recommended):
@@ -47,15 +50,17 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Environment variables (optional):
-   
-If you want to customize the CrewAI behavior or use specific LLM models, you can create a `.env` file with appropriate settings:
+4. Environment variables (required):
+
+The crew calls Gemini, so create a `.env` file in the repository root with your Google AI Studio key:
 
 ```
-OPENAI_API_KEY=your_openai_api_key
-MODEL_NAME=gpt-4-turbo
-# Add other environment variables as needed
+GOOGLE_API_KEY=your_google_api_key
+# Optional: any Gemini model id, without the gemini/ prefix
+GEMINI_MODEL=gemini-3.8-flash
 ```
+
+`GEMINI_API_KEY` also works in place of `GOOGLE_API_KEY`. No OpenAI key is needed.
 
 5. Run the application:
 
@@ -104,12 +109,13 @@ fetch('http://localhost:5010/file-handler', {
   "filename": "example.pdf",
   "markdown": "# Document Title\n\nContent in markdown format...",
   "result": {
+    "summary": "One-paragraph summary...",
     "key_points": ["Point 1", "Point 2", "..."],
     "quick_summary": "Summary of the document...",
     "extended_summary": "Detailed analysis...",
     "actionable_insights": ["Insight 1", "Insight 2", "..."],
-    "source_documents": ["Document title and description..."],
-    "potential_biases": "Discussion of biases..."
+    "source_document_list": ["Document title and description..."],
+    "potential_biases_and_limitations": "Discussion of biases..."
   }
 }
 ```
@@ -144,17 +150,7 @@ The CrewAI system is configured to analyze documents with a specific focus. The 
 
 ## Testing
 
-You can use the included test script to try out the API:
-
-```bash
-python test_pdf_parser.py /path/to/your/file.pdf
-```
-
-This will:
-1. Upload the specified PDF to the API
-2. Process the file through both Docling and CrewAI
-3. Display a summary of the results in the terminal
-4. Save the full results to a JSON file
+`test_pdf_parser.py` was removed from the repository (commit b903596), so test the API with the curl example above. `app.py` binds to your machine's LAN IP, not `localhost`, so use the address it prints on startup (`Starting server at http://<ip>:5010`).
 
 ## Project Structure
 
@@ -162,10 +158,10 @@ This will:
 .
 ├── app.py                  # FastAPI application
 ├── requirements.txt        # Project dependencies
-├── test_pdf_parser.py      # Test script for the API
 ├── file_crew/
 │   └── src/
 │       └── file_crew/
+│           ├── crew.py     # Agent, task and Gemini LLM
 │           ├── main.py     # CrewAI integration
 │           └── config/
 │               └── tasks.yaml  # Task definitions for the AI analysis
